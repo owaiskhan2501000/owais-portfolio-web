@@ -1,0 +1,133 @@
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+
+export default function Home() {
+  // Yahan main ne har project ke aakhir mein 'githubLink' add kar diya hai
+  const projects = [
+    {
+      id: 1,
+      title: "Face Mask Detection System",
+      category: "AI & Machine Learning",
+      description: "A computer vision model built to detect face masks in real-time. Created for my Final Year Project.",
+      techStack: ["Python", "OpenCV", "TensorFlow"],
+      githubLink: "https://github.com/MohammadOwais/face-mask-detection" // Yahan apna asli link lagayen
+    },
+    {
+      id: 2,
+      title: "QuickRent Pakistan",
+      category: "Web & App Development",
+      description: "An MVP and business model application designed for modern rental properties in Pakistan.",
+      techStack: ["UI/UX", "Business Planning", "MVP"],
+      githubLink: "https://github.com/MohammadOwais/quickrent-pakistan" // Yahan apna asli link lagayen
+    },
+    {
+      id: 3,
+      title: "Brand Identity & Logos",
+      category: "Graphics & Design",
+      description: "Professional business cards and logos designed for brands like J Brothers Autos and Maoli Fast Food.",
+      techStack: ["Graphic Design", "Branding"],
+      githubLink: "https://behance.net/MohammadOwais" // Agar design hai toh Behance/Drive ka link bhi de sakte hain
+    },
+    {
+      id: 4,
+      title: "2D Character Animations",
+      category: "Animation",
+      description: "Custom 2D character generation and animations for digital storytelling and content creation.",
+      techStack: ["2D Animation", "Character Design"],
+      githubLink: "https://youtube.com/MohammadOwais" // Animation ke liye YouTube/Drive link
+    }
+  ];
+
+  return (
+    <main className="min-h-screen bg-gray-950 text-white font-sans relative">
+      
+      {/* --- TOP NAVBAR --- */}
+      <header className="absolute top-0 right-0 p-6 z-10">
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg shadow-blue-500/30">
+              Sign In
+            </button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <UserButton showName={true} />
+        </SignedIn>
+      </header>
+
+      {/* --- HERO SECTION --- */}
+      <section className="flex flex-col items-center justify-center p-8 min-h-screen">
+        <div className="max-w-4xl w-full text-center">
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+            Hi, I'm <span className="text-blue-500">Mohammad Owais</span>
+          </h1>
+          <h2 className="text-2xl md:text-3xl text-gray-400 mb-8 font-medium">
+            AI Researcher | 2D Animator | Web Developer
+          </h2>
+          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+            I am a final year BS Computer Science student passionate about building modern web applications, training intelligent AI models, and creating engaging 2D animations.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#projects" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/30">
+              Explore My Projects
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* --- PROJECTS SECTION --- */}
+      <section id="projects" className="p-8 md:p-16 bg-gray-900 min-h-screen">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center">My Projects</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {projects.map((project) => (
+              <div key={project.id} className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-blue-500 transition-all group flex flex-col">
+                <span className="text-blue-400 text-sm font-semibold tracking-wider uppercase">{project.category}</span>
+                <h3 className="text-2xl font-bold mt-2 mb-4">{project.title}</h3>
+                <p className="text-gray-400 mb-6 flex-grow">{project.description}</p>
+                
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {project.techStack.map((tech, index) => (
+                    <span key={index} className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                
+                {/* --- SMART GITHUB LINK BUTTON --- */}
+                <div className="mt-auto">
+                  <SignedIn>
+                    {/* Ab yeh button nahi, balkay ek a-tag (link) hai jo naye tab mein khulega */}
+                    <a 
+                      href={project.githubLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors flex justify-center items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                      </svg>
+                      View on GitHub
+                    </a>
+                  </SignedIn>
+                  
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button className="w-full bg-gray-700 hover:bg-gray-600 text-gray-400 font-semibold py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Login to View Code
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
