@@ -4,10 +4,9 @@ import { useState } from "react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
-  // Yeh 'State' hai jo yaad rakhega ke abhi konsi zaban chal rahi hai (default 'en' yani English hai)
   const [lang, setLang] = useState<"en" | "zh">("en");
 
-  // --- TRANSLATIONS DICTIONARY ---
+  // --- TRANSLATIONS DICTIONARY (Updated with Contact Form) ---
   const t = {
     en: {
       greeting: "Hi, I'm",
@@ -18,9 +17,14 @@ export default function Home() {
       viewGithub: "View on GitHub",
       loginToView: "Login to View Code",
       signIn: "Sign In",
+      contactTitle: "Contact Me",
+      nameLabel: "Your Name",
+      emailLabel: "Your Email",
+      msgLabel: "Your Message",
+      sendBtn: "Send Message"
     },
     zh: {
-      greeting: "你好，我是", // Nǐ hǎo, wǒ shì
+      greeting: "你好，我是",
       role: "人工智能研究员 | 二维动画师 | Web 开发者", 
       bio: "我是一名计算机科学本科生，热衷于构建现代网络应用、训练智能 AI 模型以及创作二维动画。",
       exploreBtn: "浏览我的项目",
@@ -28,10 +32,14 @@ export default function Home() {
       viewGithub: "在 GitHub 上查看",
       loginToView: "登录查看代码",
       signIn: "登录",
+      contactTitle: "联系我",
+      nameLabel: "你的名字",
+      emailLabel: "你的邮箱",
+      msgLabel: "你的留言",
+      sendBtn: "发送消息"
     }
   }[lang];
 
-  // Aap ke projects (English aur Chinese dono mein)
   const projects = [
     {
       id: 1,
@@ -72,8 +80,6 @@ export default function Home() {
       
       {/* --- TOP NAVBAR --- */}
       <header className="absolute top-0 right-0 p-6 z-10 flex items-center gap-4">
-        
-        {/* Language Toggle Button */}
         <button 
           onClick={() => setLang(lang === "en" ? "zh" : "en")}
           className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-all border border-gray-600 text-sm md:text-base"
@@ -117,14 +123,12 @@ export default function Home() {
       <section id="projects" className="p-8 md:p-16 bg-gray-900 min-h-screen">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">{t.projectsTitle}</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {projects.map((project) => (
               <div key={project.id} className="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-blue-500 transition-all group flex flex-col">
                 <span className="text-blue-400 text-sm font-semibold tracking-wider uppercase">{project.category}</span>
                 <h3 className="text-2xl font-bold mt-2 mb-4">{project.title}</h3>
                 <p className="text-gray-400 mb-6 flex-grow">{project.description}</p>
-                
                 <div className="flex flex-wrap gap-2 mb-8">
                   {project.techStack.map((tech, index) => (
                     <span key={index} className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">
@@ -132,39 +136,61 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-                
                 <div className="mt-auto">
                   <SignedIn>
-                    <a 
-                      href={project.githubLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors flex justify-center items-center gap-2"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                      </svg>
+                    <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
                       {t.viewGithub}
                     </a>
                   </SignedIn>
-                  
                   <SignedOut>
                     <SignInButton mode="modal">
                       <button className="w-full bg-gray-700 hover:bg-gray-600 text-gray-400 font-semibold py-3 rounded-lg transition-colors flex justify-center items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                         {t.loginToView}
                       </button>
                     </SignInButton>
                   </SignedOut>
                 </div>
-
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* --- NEW CONTACT SECTION --- */}
+      <section className="p-8 md:p-16 bg-gray-950 min-h-screen flex flex-col items-center justify-center">
+        <div className="max-w-2xl w-full">
+          <h2 className="text-4xl font-bold mb-10 text-center">{t.contactTitle}</h2>
+          
+          <form action="https://api.web3forms.com/submit" method="POST" className="bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl flex flex-col gap-6">
+            
+            {/* YAHAN APNI ACCESS KEY PASTE KAREIN */}
+            <input type="hidden" name="access_key" value="4dc504fb-1b22-4238-9998-9ca3154ba4c2" />
+            
+            <div>
+              <label className="block text-gray-400 mb-2 font-medium">{t.nameLabel}</label>
+              <input type="text" name="name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            </div>
+
+            <div>
+              <label className="block text-gray-400 mb-2 font-medium">{t.emailLabel}</label>
+              <input type="email" name="email" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" />
+            </div>
+
+            <div>
+              <label className="block text-gray-400 mb-2 font-medium">{t.msgLabel}</label>
+              <textarea name="message" rows={5} required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"></textarea>
+            </div>
+
+            <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg transition-colors mt-2 text-lg shadow-lg shadow-blue-500/30">
+              {t.sendBtn}
+            </button>
+
+          </form>
+        </div>
+      </section>
+
     </main>
   );
 }
