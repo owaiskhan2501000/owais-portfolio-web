@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
@@ -22,7 +23,6 @@ export default function Home() {
       emailLabel: "Your Email",
       msgLabel: "Your Message",
       sendBtn: "Send Message",
-      // New Timeline Translations
       journeyTitle: "My Journey & Resume",
       downloadCV: "Download Resume (PDF)",
       timeline: [
@@ -45,7 +45,6 @@ export default function Home() {
       emailLabel: "你的邮箱",
       msgLabel: "你的留言",
       sendBtn: "发送消息",
-      // New Timeline Translations
       journeyTitle: "我的经历与简历",
       downloadCV: "下载简历 (PDF)",
       timeline: [
@@ -116,23 +115,40 @@ export default function Home() {
       </header>
 
       {/* --- HERO SECTION --- */}
-      <section className="flex flex-col items-center justify-center p-8 min-h-screen">
-        <div className="max-w-4xl w-full text-center">
+      <section className="flex flex-col md:flex-row items-center justify-center p-8 min-h-screen gap-12 max-w-6xl mx-auto">
+        
+        {/* Text Side */}
+        <div className="flex-1 text-center md:text-left order-2 md:order-1">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
             {t.greeting} <span className="text-blue-500">Mohammad Owais</span>
           </h1>
           <h2 className="text-2xl md:text-3xl text-gray-400 mb-8 font-medium">
             {t.role}
           </h2>
-          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto md:mx-0 leading-relaxed">
             {t.bio}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <a href="#projects" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/30">
               {t.exploreBtn}
             </a>
           </div>
         </div>
+
+        {/* Image Side */}
+        <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2">
+          <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-blue-600 shadow-2xl shadow-blue-500/20">
+            <Image 
+              src="/profile.png"
+              alt="Mohammad Owais"
+              fill
+              // Yahan tabdeeli ki hai: 'object-top' add kiya hai
+              className="object-cover object-top" 
+              priority
+            />
+          </div>
+        </div>
+
       </section>
 
       {/* --- TIMELINE & RESUME SECTION --- */}
@@ -154,7 +170,6 @@ export default function Home() {
           </div>
 
           <div className="text-center">
-            {/* Make sure CV name matches what you put in the public folder */}
             <a 
               href="/Mohammad_Owais_CV.pdf" 
               download="Mohammad_Owais_CV.pdf"
