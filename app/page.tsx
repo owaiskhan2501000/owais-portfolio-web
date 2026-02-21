@@ -6,7 +6,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 export default function Home() {
   const [lang, setLang] = useState<"en" | "zh">("en");
 
-  // --- TRANSLATIONS DICTIONARY (Updated with Contact Form) ---
+  // --- TRANSLATIONS DICTIONARY ---
   const t = {
     en: {
       greeting: "Hi, I'm",
@@ -21,7 +21,15 @@ export default function Home() {
       nameLabel: "Your Name",
       emailLabel: "Your Email",
       msgLabel: "Your Message",
-      sendBtn: "Send Message"
+      sendBtn: "Send Message",
+      // New Timeline Translations
+      journeyTitle: "My Journey & Resume",
+      downloadCV: "Download Resume (PDF)",
+      timeline: [
+        { year: "2027 & Beyond", title: "Master's in AI (China)", desc: "Aiming to secure a fully-funded scholarship to pursue advanced research in Artificial Intelligence." },
+        { year: "Feb/March 2027", title: "BS Computer Science", desc: "Expected graduation. Currently in my 7th semester, specializing in Web Technologies and Computer Vision." },
+        { year: "2025 - 2026", title: "Final Year Projects", desc: "Developed a real-time Face Mask Detection system and a business model MVP for QuickRent Pakistan." }
+      ]
     },
     zh: {
       greeting: "你好，我是",
@@ -36,7 +44,15 @@ export default function Home() {
       nameLabel: "你的名字",
       emailLabel: "你的邮箱",
       msgLabel: "你的留言",
-      sendBtn: "发送消息"
+      sendBtn: "发送消息",
+      // New Timeline Translations
+      journeyTitle: "我的经历与简历",
+      downloadCV: "下载简历 (PDF)",
+      timeline: [
+        { year: "2027 及以后", title: "人工智能硕士 (中国)", desc: "致力于获得全额奖学金，以在人工智能领域进行深入的高级研究。" },
+        { year: "2027年 2/3月", title: "计算机科学学士", desc: "预计毕业。目前大四（第七学期），专注于网络技术和计算机视觉。" },
+        { year: "2025 - 2026", title: "毕业设计项目", desc: "开发了实时口罩检测系统以及 QuickRent Pakistan 的商业模式 MVP。" }
+      ]
     }
   }[lang];
 
@@ -119,6 +135,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- TIMELINE & RESUME SECTION --- */}
+      <section className="p-8 md:p-16 bg-gray-950 min-h-screen">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center">{t.journeyTitle}</h2>
+          
+          <div className="relative border-l-2 border-blue-600 ml-4 md:ml-0 mb-12">
+            {t.timeline.map((item, index) => (
+              <div key={index} className="mb-10 ml-8 relative group">
+                <span className="absolute -left-[41px] top-1 h-5 w-5 rounded-full bg-blue-600 border-4 border-gray-950 group-hover:bg-white transition-colors"></span>
+                <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-blue-500 transition-colors shadow-lg">
+                  <span className="text-blue-400 font-bold text-sm tracking-widest uppercase">{item.year}</span>
+                  <h3 className="text-xl font-bold mt-1 mb-2 text-white">{item.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            {/* Make sure CV name matches what you put in the public folder */}
+            <a 
+              href="/Mohammad_Owais_CV.pdf" 
+              download="Mohammad_Owais_CV.pdf"
+              className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              {t.downloadCV}
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* --- PROJECTS SECTION --- */}
       <section id="projects" className="p-8 md:p-16 bg-gray-900 min-h-screen">
         <div className="max-w-6xl mx-auto">
@@ -158,14 +206,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW CONTACT SECTION --- */}
+      {/* --- CONTACT SECTION --- */}
       <section className="p-8 md:p-16 bg-gray-950 min-h-screen flex flex-col items-center justify-center">
         <div className="max-w-2xl w-full">
           <h2 className="text-4xl font-bold mb-10 text-center">{t.contactTitle}</h2>
           
           <form action="https://api.web3forms.com/submit" method="POST" className="bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl flex flex-col gap-6">
             
-            {/* YAHAN APNI ACCESS KEY PASTE KAREIN */}
+            {/* MAKE SURE TO PUT YOUR ACCESS KEY BACK HERE */}
             <input type="hidden" name="access_key" value="4dc504fb-1b22-4238-9998-9ca3154ba4c2" />
             
             <div>
