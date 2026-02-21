@@ -1,13 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react"; // useRef add kiya hai
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [lang, setLang] = useState<"en" | "zh">("en");
+  
+  // Slider ko control karne ke liye Ref
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  // --- TRANSLATIONS DICTIONARY ---
+  const slideLeft = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: -400, behavior: "smooth" });
+    }
+  };
+
+  const slideRight = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: 400, behavior: "smooth" });
+    }
+  };
+
   const t = {
     en: {
       greeting: "Hi, I'm",
@@ -29,7 +43,9 @@ export default function Home() {
         { year: "2027 & Beyond", title: "Master's in AI (China)", desc: "Aiming to secure a fully-funded scholarship to pursue advanced research in Artificial Intelligence." },
         { year: "Feb/March 2027", title: "BS Computer Science", desc: "Expected graduation. Currently in my 7th semester, specializing in Web Technologies and Computer Vision." },
         { year: "2025 - 2026", title: "Final Year Projects", desc: "Developed a real-time Face Mask Detection system and a business model MVP for QuickRent Pakistan." }
-      ]
+      ],
+      animTitle: "2D Animation Showcase",
+      animDesc: "Swipe or use arrows to see some of my custom 2D character designs and animations in action."
     },
     zh: {
       greeting: "你好，我是",
@@ -51,7 +67,9 @@ export default function Home() {
         { year: "2027 及以后", title: "人工智能硕士 (中国)", desc: "致力于获得全额奖学金，以在人工智能领域进行深入的高级研究。" },
         { year: "2027年 2/3月", title: "计算机科学学士", desc: "预计毕业。目前大四（第七学期），专注于网络技术和计算机视觉。" },
         { year: "2025 - 2026", title: "毕业设计项目", desc: "开发了实时口罩检测系统以及 QuickRent Pakistan 的商业模式 MVP。" }
-      ]
+      ],
+      animTitle: "二维动画展示",
+      animDesc: "滑动或使用箭头查看我的一些自定义二维角色设计和动画演示。"
     }
   }[lang];
 
@@ -90,72 +108,44 @@ export default function Home() {
     }
   ];
 
+  const animations = [
+    { id: 1, title: "Animation Clip 1", src: "/clip1.mp4" },
+    { id: 2, title: "Animation Clip 2", src: "/clip2.mp4" },
+    { id: 3, title: "Animation Clip 3", src: "/clip3.mp4" }
+  ];
+
   return (
     <main className="min-h-screen bg-gray-950 text-white font-sans relative transition-all duration-300">
       
-      {/* --- TOP NAVBAR --- */}
       <header className="absolute top-0 right-0 p-6 z-10 flex items-center gap-4">
-        <button 
-          onClick={() => setLang(lang === "en" ? "zh" : "en")}
-          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-all border border-gray-600 text-sm md:text-base"
-        >
+        <button onClick={() => setLang(lang === "en" ? "zh" : "en")} className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-all border border-gray-600 text-sm md:text-base">
           {lang === "en" ? "🇨🇳 中文" : "🇺🇸 English"}
         </button>
-
         <SignedOut>
-          <SignInButton mode="modal">
-            <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg shadow-blue-500/30">
-              {t.signIn}
-            </button>
-          </SignInButton>
+          <SignInButton mode="modal"><button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg shadow-blue-500/30">{t.signIn}</button></SignInButton>
         </SignedOut>
-        <SignedIn>
-          <UserButton showName={true} />
-        </SignedIn>
+        <SignedIn><UserButton showName={true} /></SignedIn>
       </header>
 
-      {/* --- HERO SECTION --- */}
       <section className="flex flex-col md:flex-row items-center justify-center p-8 min-h-screen gap-12 max-w-6xl mx-auto">
-        
-        {/* Text Side */}
         <div className="flex-1 text-center md:text-left order-2 md:order-1">
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
-            {t.greeting} <span className="text-blue-500">Mohammad Owais</span>
-          </h1>
-          <h2 className="text-2xl md:text-3xl text-gray-400 mb-8 font-medium">
-            {t.role}
-          </h2>
-          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto md:mx-0 leading-relaxed">
-            {t.bio}
-          </p>
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">{t.greeting} <span className="text-blue-500">Mohammad Owais</span></h1>
+          <h2 className="text-2xl md:text-3xl text-gray-400 mb-8 font-medium">{t.role}</h2>
+          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto md:mx-0 leading-relaxed">{t.bio}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <a href="#projects" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/30">
-              {t.exploreBtn}
-            </a>
+            <a href="#projects" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-blue-500/30">{t.exploreBtn}</a>
           </div>
         </div>
-
-        {/* Image Side */}
         <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2">
           <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-blue-600 shadow-2xl shadow-blue-500/20">
-            <Image 
-              src="/profile.png"
-              alt="Mohammad Owais"
-              fill
-              // Yahan tabdeeli ki hai: 'object-top' add kiya hai
-              className="object-cover object-top" 
-              priority
-            />
+            <Image src="/profile.png" alt="Mohammad Owais" fill className="object-cover object-top" priority />
           </div>
         </div>
-
       </section>
 
-      {/* --- TIMELINE & RESUME SECTION --- */}
       <section className="p-8 md:p-16 bg-gray-950 min-h-screen">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">{t.journeyTitle}</h2>
-          
           <div className="relative border-l-2 border-blue-600 ml-4 md:ml-0 mb-12">
             {t.timeline.map((item, index) => (
               <div key={index} className="mb-10 ml-8 relative group">
@@ -168,13 +158,8 @@ export default function Home() {
               </div>
             ))}
           </div>
-
           <div className="text-center">
-            <a 
-              href="/Mohammad_Owais_CV.pdf" 
-              download="Mohammad_Owais_CV.pdf"
-              className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg"
-            >
+            <a href="/Mohammad_Owais_CV.pdf" download="Mohammad_Owais_CV.pdf" className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
               {t.downloadCV}
             </a>
@@ -182,8 +167,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- PROJECTS SECTION --- */}
-      <section id="projects" className="p-8 md:p-16 bg-gray-900 min-h-screen">
+      <section id="projects" className="p-8 md:p-16 bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">{t.projectsTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -193,11 +177,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold mt-2 mb-4">{project.title}</h3>
                 <p className="text-gray-400 mb-6 flex-grow">{project.description}</p>
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {project.techStack.map((tech, index) => (
-                    <span key={index} className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">
-                      {tech}
-                    </span>
-                  ))}
+                  {project.techStack.map((tech, index) => <span key={index} className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">{tech}</span>)}
                 </div>
                 <div className="mt-auto">
                   <SignedIn>
@@ -214,6 +194,44 @@ export default function Home() {
                       </button>
                     </SignInButton>
                   </SignedOut>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- ANIMATION SECTION WITH BUTTONS --- */}
+      <section className="p-8 md:p-16 bg-gray-900 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto">
+          
+          {/* Header & Buttons Container */}
+          <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
+            <div className="text-center md:text-left">
+              <h2 className="text-4xl font-bold mb-4">{t.animTitle} 🎨</h2>
+              <p className="text-gray-400 text-lg">{t.animDesc}</p>
+            </div>
+            
+            {/* Left/Right Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button onClick={slideLeft} className="p-4 bg-gray-800 hover:bg-blue-600 text-white rounded-full transition-all border border-gray-700 hover:border-blue-500 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button onClick={slideRight} className="p-4 bg-gray-800 hover:bg-blue-600 text-white rounded-full transition-all border border-gray-700 hover:border-blue-500 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+          </div>
+          
+          {/* Scrollable Container */}
+          <div ref={sliderRef} className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar scroll-smooth">
+            {animations.map((anim) => (
+              <div key={anim.id} className="min-w-[300px] md:min-w-[450px] bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden snap-center flex-shrink-0 group hover:border-blue-500 transition-all shadow-lg">
+                <div className="relative h-64 md:h-80 w-full bg-black">
+                  <video src={anim.src} autoPlay loop muted playsInline className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-white">{anim.title}</h3>
                 </div>
               </div>
             ))}
@@ -254,6 +272,15 @@ export default function Home() {
         </div>
       </section>
 
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </main>
   );
 }
