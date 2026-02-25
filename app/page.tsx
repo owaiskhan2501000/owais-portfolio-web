@@ -1,5 +1,6 @@
 "use client";
 
+import Lenis from "lenis";
 import { useState, useRef, useEffect } from "react"; // useEffect add kiya hai
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -112,6 +113,30 @@ const scrollToTop = (e: React.MouseEvent) => {
     return () => clearInterval(timer);
   }, [t.greeting]); // Zaban change hone par yeh effect dobara chalega
   // -------------------------------
+
+  // --- SMOOTH SCROLL (LENIS) LOGIC SHURU ---
+  useEffect(() => {
+    // Lenis ko start karna
+    const lenis = new Lenis({
+      duration: 1.2, // Scrolling kitni der tak smoothly slide hogi
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Animation ka smooth curve
+      touchMultiplier: 2, // Mobile par touch scrolling ki speed
+    });
+
+    // Browser ko batana ke har frame par scrolling ko update kare
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    // Jab component close ho toh isay clean kar dena
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+  // --- SMOOTH SCROLL LOGIC KHATAM ---
 
   const projects = [
     {
