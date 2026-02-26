@@ -22,18 +22,30 @@ export default function Home() {
     }
   };
 
-const scrollToTop = (e: React.MouseEvent) => {
+// --- INTERRUPTIBLE SMOOTH SCROLL TO TOP ---
+  const scrollToTop = (e: React.MouseEvent) => {
     e.preventDefault();
+    
+    // Shuru mein hum position note kar lete hain
+    let expectedTop = document.documentElement.scrollTop || document.body.scrollTop;
+
     const smoothScroll = () => {
-      const currentPosition = document.documentElement.scrollTop || document.body.scrollTop;
-      
-      // Agar position 1 se zyada hai toh animate karo
-      if (currentPosition > 1) { 
+      const currentTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+      // USER INTERRUPTION DETECTOR:
+      // Agar screen wahan nahi hai jahan code ne socha tha (matlab user ne beech mein scroll kar diya),
+      // toh fauran chup-chap animation ko rok do (cancel kar do)!
+      if (Math.abs(currentTop - expectedTop) > 2) {
+        return; 
+      }
+
+      if (currentTop > 1) {
+        // Agla qadam calculate karo aur wahan jao
+        expectedTop = Math.floor(currentTop - currentTop / 12);
+        window.scrollTo(0, expectedTop);
         window.requestAnimationFrame(smoothScroll);
-        window.scrollTo(0, Math.floor(currentPosition - currentPosition / 12)); 
       } else {
-        // Jaise hi top par pohnchay, animation ko permanently rok do
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
       }
     };
     smoothScroll();
@@ -94,25 +106,30 @@ const scrollToTop = (e: React.MouseEvent) => {
     }
   }[lang];
 
-  // --- TYPEWRITER EFFECT LOGIC ---
+// --- TYPEWRITER EFFECT LOGIC (SMOOTH & BALANCED) ---
   const [typedText, setTypedText] = useState("");
   
   useEffect(() => {
-    setTypedText(""); // Jab bhi zaban badle, text clear kar do
+    setTypedText(""); 
     let i = 0;
     const fullText = `${t.greeting} Mohammad Owais`;
-    
-    const timer = setInterval(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const typeWriter = () => {
       setTypedText(fullText.slice(0, i + 1));
       i++;
-      if (i >= fullText.length) {
-        clearInterval(timer);
+      if (i < fullText.length) {
+        // SPEED CONTROL: 70ms se 120ms ke darmiyan random speed (Smooth aur Aahista)
+        const nextSpeed = Math.random() * 50 + 70; 
+        timeoutId = setTimeout(typeWriter, nextSpeed);
       }
-    }, 100); // 100ms ki speed se type hoga
+    };
 
-    return () => clearInterval(timer);
-  }, [t.greeting]); // Zaban change hone par yeh effect dobara chalega
-  // -------------------------------
+    typeWriter();
+
+    return () => clearTimeout(timeoutId);
+  }, [t.greeting]); 
+  // ------------------------------------------------
 
   // --- SMOOTH SCROLL (LENIS) LOGIC SHURU ---
   useEffect(() => {
@@ -394,16 +411,16 @@ const scrollToTop = (e: React.MouseEvent) => {
 
           {/* Center: Social Icons */}
           <div className="flex justify-center items-center gap-6 flex-1">
-            <a href="https://github.com/MohammadOwais" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white hover:scale-110 transition-all" title="GitHub">
+            <a href="https://github.com/owaiskhan2501000" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white hover:scale-110 transition-all" title="GitHub">
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
             </a>
-            <a href="https://linkedin.com/in/mohammadowais" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500 hover:scale-110 transition-all" title="LinkedIn">
+            <a href="https://www.linkedin.com/in/mohammad-owais-5653983b3" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-500 hover:scale-110 transition-all" title="LinkedIn">
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg>
             </a>
-            <a href="https://youtube.com/MohammadOwais" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-red-500 hover:scale-110 transition-all" title="YouTube">
+            <a href="http://www.youtube.com/@animatty13607" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-red-500 hover:scale-110 transition-all" title="YouTube">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             </a>
-            <a href="https://behance.net/MohammadOwais" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-400 hover:scale-110 transition-all" title="Behance">
+            <a href="https://www.behance.net/mohammadowais28" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-400 hover:scale-110 transition-all" title="Behance">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M14.605 10.058c-1.042 0-1.745.247-2.112.74-.367.493-.55 1.16-.55 2.003h5.275c-.015-.862-.213-1.536-.593-2.02-.382-.485-1.025-.723-2.02-.723zm-7.925-1.99h-6.68v11.8h6.985c1.43 0 2.502-.345 3.218-1.037.715-.693 1.073-1.63 1.073-2.81 0-.75-.178-1.405-.533-1.966-.356-.56-.848-.95-1.478-1.17.47-.2.836-.525 1.096-.975.26-.45.39-.98.39-1.59 0-1.06-.328-1.85-1.002-2.385-.674-.535-1.69-.8-3.048-.8zm7.883 7.825c.348.455.93.682 1.748.682 1.127 0 1.838-.415 2.13-1.245h2.24c-.23 1.065-.77 1.9-1.62 2.505-.85.605-1.92.907-3.21.907-1.737 0-3.06-.51-3.97-1.53-.91-1.02-1.365-2.44-1.365-4.26 0-1.835.45-3.28 1.35-4.33.9-1.05 2.22-1.575 3.96-1.575 1.635 0 2.875.503 3.72 1.508.845 1.005 1.267 2.457 1.267 4.355v1.07h-7.65c.03.82.26 1.465.688 1.918zm-7.665-2.585h-4.14v-3.79h4.095c.875 0 1.485.178 1.83.535.345.358.518.848.518 1.47 0 .585-.162 1.04-.486 1.365-.325.326-.93.49-1.817.49zm.348 4.31h-4.485v-4.34h4.485c.985 0 1.66.196 2.025.59.365.394.548.96.548 1.7 0 .7-.183 1.25-.55 1.65-.366.4-1.04.6-2.023.6zm10.74-12.08h-6.26v1.495h6.26v-1.495z"/></svg>
             </a>
           </div>
