@@ -89,6 +89,11 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Force layout recalculation on mount (fixes mobile initial render)
+  useEffect(() => {
+    requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+  }, []);
+
   // Lenis smooth scroll (desktop only — mobile uses native touch scroll)
   useEffect(() => {
     const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
@@ -263,7 +268,7 @@ export default function Home() {
   ];
 
   return (
-    <main id="top" className="min-h-screen bg-[#050810] text-white font-sans relative flex flex-col">
+    <main id="top" className="min-h-[100dvh] bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
 
       {/* ━━━ NAVBAR ━━━ */}
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isNavScrolled ? "bg-[#050810]/80 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/30" : ""}`}>
@@ -328,7 +333,7 @@ export default function Home() {
       </nav>
 
       {/* ━━━ HERO ━━━ */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
         {/* Parallax background */}
         <motion.div className="absolute inset-0 z-0" style={{ y: heroY }}>
           <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30">
