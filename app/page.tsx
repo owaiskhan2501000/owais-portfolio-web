@@ -263,7 +263,7 @@ export default function Home() {
   ];
 
   return (
-    <main id="top" className="min-h-screen bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
+    <main id="top" className="min-h-screen bg-[#050810] text-white font-sans relative flex flex-col">
 
       {/* ━━━ NAVBAR ━━━ */}
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isNavScrolled ? "bg-[#050810]/80 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/30" : ""}`}>
