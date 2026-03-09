@@ -89,9 +89,11 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lenis smooth scroll
+  // Lenis smooth scroll (desktop only — mobile uses native touch scroll)
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, touchMultiplier: 1.5 });
+    const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+    if (isMobile) return;
+    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
     let id: number;
     const raf = (t: number) => { lenis.raf(t); id = requestAnimationFrame(raf); };
     id = requestAnimationFrame(raf);
