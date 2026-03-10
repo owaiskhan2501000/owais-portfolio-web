@@ -1,14 +1,13 @@
 "use client";
 
-import Lenis from "lenis";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 
 /* ── Reusable Components ── */
 
-function Reveal({ children, delay = 0, direction = "up", className = "" }: { children: React.ReactNode; delay?: number; direction?: "up" | "left" | "right"; className?: string }) {
+const Reveal = memo(function Reveal({ children, delay = 0, direction = "up", className = "" }: { children: React.ReactNode; delay?: number; direction?: "up" | "left" | "right"; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const xy = { up: { y: 50 }, left: { x: -50 }, right: { x: 50 } }[direction];
@@ -20,9 +19,9 @@ function Reveal({ children, delay = 0, direction = "up", className = "" }: { chi
       style={{ willChange: inView ? "auto" : "transform, opacity" }}
     >{children}</motion.div>
   );
-}
+});
 
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
+const Counter = memo(function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const [n, setN] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
@@ -34,23 +33,24 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
     return () => clearInterval(id);
   }, [inView, to]);
   return <span ref={ref}>{n}{suffix}</span>;
-}
+});
 
-function MagneticWrap({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+const MagneticWrap = memo(function MagneticWrap({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-  const handleMove = (e: React.MouseEvent) => {
+  const handleMove = useCallback((e: React.MouseEvent) => {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     setPos({ x: (e.clientX - r.left - r.width / 2) * 0.15, y: (e.clientY - r.top - r.height / 2) * 0.15 });
-  };
+  }, []);
+  const handleLeave = useCallback(() => setPos({ x: 0, y: 0 }), []);
   return (
-    <motion.div ref={ref} className={className} onMouseMove={handleMove} onMouseLeave={() => setPos({ x: 0, y: 0 })}
+    <motion.div ref={ref} className={className} onMouseMove={handleMove} onMouseLeave={handleLeave}
       animate={pos} transition={{ type: "spring", stiffness: 200, damping: 15 }}
     >{children}</motion.div>
   );
-}
+});
 
 /* ── Page ── */
 
@@ -61,13 +61,10 @@ export default function Home() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const sliderRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(heroProgress, [0, 1], ["0%", "30%"]);
   const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0]);
-
-  const slide = (dir: number) => sliderRef.current?.scrollBy({ left: dir * 420, behavior: "smooth" });
 
   // Active section tracking
   useEffect(() => {
@@ -94,19 +91,25 @@ export default function Home() {
     requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
   }, []);
 
-  // Lenis smooth scroll (desktop only — mobile uses native touch scroll)
+  // Lenis smooth scroll (desktop only — dynamically imported to reduce bundle)
   useEffect(() => {
     const isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
     if (isMobile) return;
-    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
     let id: number;
-    const raf = (t: number) => { lenis.raf(t); id = requestAnimationFrame(raf); };
-    id = requestAnimationFrame(raf);
-    return () => { cancelAnimationFrame(id); lenis.destroy(); };
+    let destroyed = false;
+    import("lenis").then(({ default: Lenis }) => {
+      if (destroyed) return;
+      const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
+      const raf = (t: number) => { lenis.raf(t); id = requestAnimationFrame(raf); };
+      id = requestAnimationFrame(raf);
+      // store cleanup
+      (window as unknown as Record<string, unknown>).__lenisCleanup = () => { cancelAnimationFrame(id); lenis.destroy(); };
+    });
+    return () => { destroyed = true; const c = (window as unknown as Record<string, unknown>).__lenisCleanup as (() => void) | undefined; c?.(); };
   }, []);
 
-  /* ── i18n content ── */
-  const t = {
+  /* ── i18n content (memoized to avoid re-creating on every render) ── */
+  const t = useMemo(() => ({
     en: {
       greeting: "Hi, I'm",
       name: "Mohammad Owais",
@@ -217,7 +220,7 @@ export default function Home() {
       navAnimations: "动画",
       navContact: "联系",
     },
-  }[lang];
+  })[lang], [lang]);
 
   // Typewriter
   const [typed, setTyped] = useState("");
@@ -232,7 +235,7 @@ export default function Home() {
   }, [t.greeting, t.name]);
 
   // Contact form handler
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormStatus("sending");
     const form = e.currentTarget;
@@ -242,22 +245,22 @@ export default function Home() {
       if (res.ok) { setFormStatus("sent"); form.reset(); setTimeout(() => setFormStatus("idle"), 4000); }
       else setFormStatus("error");
     } catch { setFormStatus("error"); }
-  };
+  }, []);
 
-  const projects = [
+  const projects = useMemo(() => [
     { id: 1, title: lang === "en" ? "Face Mask Detection System" : "口罩检测系统", category: "AI / Computer Vision", description: lang === "en" ? "Real-time face mask detection using deep learning. Built with Python, OpenCV, and TensorFlow as part of my Final Year Project." : "使用深度学习进行实时口罩检测。使用 Python、OpenCV 和 TensorFlow 作为毕业设计项目构建。", techStack: ["Python", "OpenCV", "TensorFlow", "CNN"], githubLink: "https://github.com/MohammadOwais/face-mask-detection", color: "from-violet-500/20 to-blue-500/20" },
     { id: 2, title: lang === "en" ? "Interactive Personal Portfolio" : "互动个人主页", category: "Frontend Development", description: lang === "en" ? "A highly interactive, bilingual portfolio built with Next.js. Features Lenis smooth scrolling, Framer Motion animations, and secure Clerk authentication." : "一个基于 Next.js 构建的高交互性双语个人主页。具有 Lenis 平滑滚动、Framer Motion 动画和安全的 Clerk 身份验证功能。", techStack: ["Next.js", "Tailwind CSS", "Framer Motion", "Lenis"], githubLink: "https://github.com/owaiskhan2501000/owais-portfolio-web", color: "from-emerald-500/20 to-teal-500/20" },
     { id: 3, title: lang === "en" ? "Brand Identity & Logos" : "品牌形象与徽标", category: "Graphic Design", description: lang === "en" ? "Professional brand identities including logos, business cards and guidelines for J Brothers Autos and Maoli Fast Food." : "专业品牌形象设计，包括 J Brothers Autos 和 Maoli Fast Food 的徽标、名片和品牌指南。", techStack: ["Illustrator", "Branding", "Typography"], githubLink: "https://behance.net/MohammadOwais", color: "from-orange-500/20 to-rose-500/20" },
     { id: 4, title: lang === "en" ? "2D Character Animations" : "二维角色动画", category: "Motion Design", description: lang === "en" ? "Custom 2D character rigs and animations for digital storytelling, explainer videos and social content." : "用于数字故事、解说视频和社交内容的定制二维角色骨骼和动画。", techStack: ["After Effects", "Animate", "Character Design"], githubLink: "https://youtube.com/MohammadOwais", color: "from-pink-500/20 to-purple-500/20" },
-  ];
+  ], [lang]);
 
-  const animations = [
+  const animations = useMemo(() => [
     { id: 1, title: "Character Walk Cycle", src: "/clip1.mp4" },
     { id: 2, title: "Explainer Animation", src: "/clip2.mp4" },
     { id: 3, title: "Logo Motion Reveal", src: "/clip3.mp4" },
-  ];
+  ], []);
 
-  const navLinks = [
+  const navLinks = useMemo(() => [
     { id: "top", label: t.navHome },
     { id: "about", label: t.navAbout },
     { id: "journey", label: t.navJourney },
@@ -265,7 +268,7 @@ export default function Home() {
     { id: "projects", label: t.navProjects },
     { id: "animations", label: t.navAnimations },
     { id: "contact", label: t.navContact },
-  ];
+  ], [t.navHome, t.navAbout, t.navJourney, t.navSkills, t.navProjects, t.navAnimations, t.navContact]);
 
   return (
     <main id="top" className="min-h-[100dvh] bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
@@ -335,16 +338,16 @@ export default function Home() {
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
         {/* Parallax background */}
-        <motion.div className="absolute inset-0 z-0" style={{ y: heroY }}>
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30">
+        <motion.div className="absolute inset-0 z-0 transform-gpu pointer-events-none" style={{ y: heroY, willChange: "transform" }}>
+          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 transform-gpu">
             <source src="/bg-video.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-[#050810]/40 via-[#050810]/70 to-[#050810]" />
         </motion.div>
 
-        {/* Ambient orbs */}
-        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-blue-600/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-1/4 -right-32 w-[400px] h-[400px] bg-purple-600/6 rounded-full blur-[120px]" />
+        {/* Ambient orbs — GPU-composited */}
+        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-blue-600/8 rounded-full blur-[140px] transform-gpu will-change-[transform]" />
+        <div className="absolute bottom-1/4 -right-32 w-[400px] h-[400px] bg-purple-600/6 rounded-full blur-[120px] transform-gpu will-change-[transform]" />
 
         <motion.div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-16" style={{ opacity: heroOpacity }}>
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
@@ -360,7 +363,7 @@ export default function Home() {
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1]">
                   <span className="text-white">{typed.slice(0, t.greeting.length + 1)}</span>
                   <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">{typed.slice(t.greeting.length + 1)}</span>
-                  <motion.span animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="text-blue-400 font-light">|</motion.span>
+                  <span className="text-blue-400 font-light animate-cursor-blink">|</span>
                 </h1>
               </div>
 
@@ -400,12 +403,12 @@ export default function Home() {
         </motion.div>
 
         {/* Scroll indicator */}
-        <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2" animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-scroll-bounce">
           <span className="text-[10px] uppercase tracking-[3px] text-gray-600 font-medium">{lang === "en" ? "Scroll" : "滚动"}</span>
           <div className="w-5 h-8 rounded-full border border-gray-700 flex items-start justify-center p-1.5">
-            <motion.div className="w-1 h-1.5 rounded-full bg-gray-500" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} />
+            <div className="w-1 h-1.5 rounded-full bg-gray-500 animate-scroll-dot" />
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ━━━ STATS BAR ━━━ */}

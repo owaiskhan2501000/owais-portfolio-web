@@ -44,3 +44,28 @@ body {
 @media (max-width: 768px) {
   * { -webkit-tap-highlight-color: transparent; }
 }
+
+/* ── CSS Animations (avoids Framer Motion JS loop) ── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.animate-cursor-blink {
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+.animate-scroll-bounce {
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+@keyframes scroll-dot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+.animate-scroll-dot {
+  animation: scroll-dot 1.5s ease-in-out infinite;
+}
