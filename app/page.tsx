@@ -246,7 +246,7 @@ export default function Home() {
 
   const projects = [
     { id: 1, title: lang === "en" ? "Face Mask Detection System" : "口罩检测系统", category: "AI / Computer Vision", description: lang === "en" ? "Real-time face mask detection using deep learning. Built with Python, OpenCV, and TensorFlow as part of my Final Year Project." : "使用深度学习进行实时口罩检测。使用 Python、OpenCV 和 TensorFlow 作为毕业设计项目构建。", techStack: ["Python", "OpenCV", "TensorFlow", "CNN"], githubLink: "https://github.com/MohammadOwais/face-mask-detection", color: "from-violet-500/20 to-blue-500/20" },
-    { id: 2, title: "QuickRent Pakistan", category: "Full-Stack / MVP", description: lang === "en" ? "A rental marketplace MVP for Pakistan — end-to-end product design, business modelling and interactive prototype." : "巴基斯坦租赁市场 MVP — 端到端产品设计、商业建模和交互式原型。", techStack: ["React", "Node.js", "UI/UX", "MVP"], githubLink: "https://github.com/MohammadOwais/quickrent-pakistan", color: "from-emerald-500/20 to-teal-500/20" },
+    { id: 2, title: lang === "en" ? "Interactive Personal Portfolio" : "互动个人主页", category: "Frontend Development", description: lang === "en" ? "A highly interactive, bilingual portfolio built with Next.js. Features Lenis smooth scrolling, Framer Motion animations, and secure Clerk authentication." : "一个基于 Next.js 构建的高交互性双语个人主页。具有 Lenis 平滑滚动、Framer Motion 动画和安全的 Clerk 身份验证功能。", techStack: ["Next.js", "Tailwind CSS", "Framer Motion", "Lenis"], githubLink: "https://github.com/owaiskhan2501000/owais-portfolio-web", color: "from-emerald-500/20 to-teal-500/20" },
     { id: 3, title: lang === "en" ? "Brand Identity & Logos" : "品牌形象与徽标", category: "Graphic Design", description: lang === "en" ? "Professional brand identities including logos, business cards and guidelines for J Brothers Autos and Maoli Fast Food." : "专业品牌形象设计，包括 J Brothers Autos 和 Maoli Fast Food 的徽标、名片和品牌指南。", techStack: ["Illustrator", "Branding", "Typography"], githubLink: "https://behance.net/MohammadOwais", color: "from-orange-500/20 to-rose-500/20" },
     { id: 4, title: lang === "en" ? "2D Character Animations" : "二维角色动画", category: "Motion Design", description: lang === "en" ? "Custom 2D character rigs and animations for digital storytelling, explainer videos and social content." : "用于数字故事、解说视频和社交内容的定制二维角色骨骼和动画。", techStack: ["After Effects", "Animate", "Character Design"], githubLink: "https://youtube.com/MohammadOwais", color: "from-pink-500/20 to-purple-500/20" },
   ];
@@ -279,8 +279,8 @@ export default function Home() {
             <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-gradient-to-r from-blue-400 to-cyan-400 group-hover:w-full transition-all duration-300"></span>
           </a>
 
-          {/* Desktop Links */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop Links — absolutely centered */}
+          <div className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
             {navLinks.map((l) => (
               <a key={l.id} href={`#${l.id}`}
                 className={`relative px-3 py-2 text-[13px] font-medium uppercase tracking-wider transition-colors duration-300 ${activeSection === l.id ? "text-white" : "text-gray-500 hover:text-gray-300"}`}>
