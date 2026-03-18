@@ -34,8 +34,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Mohammad Owais" }],
   creator: "Mohammad Owais",
+  metadataBase: new URL("https://owais-portfolio-web.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
+    url: "https://owais-portfolio-web.vercel.app",
     title: "Mohammad Owais — AI Researcher, Animator & Developer",
     description:
       "AI research, creative animation & modern web engineering — all in one portfolio.",
