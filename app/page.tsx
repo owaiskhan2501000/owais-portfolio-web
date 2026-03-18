@@ -136,7 +136,8 @@ export default function Home() {
       downloadCV: "Download Resume",
       timeline: [
         { year: "2027+", title: "Master's in AI — China", desc: "Pursuing a fully-funded scholarship for advanced research in Artificial Intelligence and Deep Learning.", icon: "🎓" },
-        { year: "2027", title: "BS Computer Science", desc: "Expected graduation with specialization in Web Technologies and Computer Vision. Currently in 7th semester.", icon: "🏫" },
+        { year: "2025 – Present", title: "Freelance AI Researcher, Web Developer & 2D Animator", desc: "Delivering end-to-end digital solutions by combining software engineering, artificial intelligence, and creative design. Specializing in high-performance Next.js web applications, custom AI models (like Real-ESRGAN and OpenCV detection systems), and creating dynamic 2D animations using Seedance 2.0 with a strict focus on character consistency.", icon: "💼" },
+        { year: "2027", title: "BS Computer Science", desc: "Graduated with a focus on Artificial Intelligence and Web Technologies. Awarded the Front-End Developer Award.", icon: "🏫" },
         { year: "2025–26", title: "Final Year Projects & Freelance", desc: "Built real-time Face Mask Detection system (OpenCV + TensorFlow); developed QuickRent Pakistan MVP; freelanced on branding projects.", icon: "🚀" },
       ],
       skillsTitle: "Tech Stack",
@@ -191,7 +192,8 @@ export default function Home() {
       downloadCV: "下载简历",
       timeline: [
         { year: "2027+", title: "人工智能硕士 — 中国", desc: "致力于获得全额奖学金，深入人工智能和深度学习的高级研究。", icon: "🎓" },
-        { year: "2027", title: "计算机科学学士", desc: "预计毕业，专注于网络技术和计算机视觉。目前第七学期。", icon: "🏫" },
+        { year: "2025 – 至今", title: "自由职业AI研究员、Web开发者及2D动画师", desc: "通过结合软件工程、人工智能和创意设计，提供端到端的数字解决方案。专注于高性能Next.js Web应用、自定义AI模型（如Real-ESRGAN和OpenCV检测系统），以及使用Seedance 2.0创作2D动画，严格保持角色一致性。", icon: "💼" },
+        { year: "2027", title: "计算机科学学士", desc: "已毕业，专注于人工智能和网络技术。荣获前端开发者奖项。", icon: "🏫" },
         { year: "2025–26", title: "毕业设计与自由职业", desc: "构建了实时口罩检测系统；开发了 QuickRent Pakistan MVP；承接品牌设计项目。", icon: "🚀" },
       ],
       skillsTitle: "技术栈",
