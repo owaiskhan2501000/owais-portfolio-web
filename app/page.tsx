@@ -454,33 +454,54 @@ export default function Home() {
       {/* ━━━ JOURNEY ━━━ */}
       <section id="journey" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Reveal>
             <p className="text-xs uppercase tracking-[4px] text-blue-400 font-semibold mb-4 text-center">{t.journeyTitle}</p>
             <h2 className="text-3xl sm:text-4xl font-black text-center mb-16">{lang === "en" ? "From Student to Builder" : "从学生到构建者"}</h2>
           </Reveal>
 
-          <div className="relative">
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent" />
-            {t.timeline.map((item, i) => (
-              <Reveal key={i} delay={i * 0.15} direction={i % 2 === 0 ? "left" : "right"}>
-                <div className={`relative flex items-start gap-6 mb-12 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"} md:gap-10`}>
-                  <div className={`hidden md:block flex-1 ${i % 2 === 0 ? "text-right" : "text-left"}`}>
-                    <span className="text-xs font-bold tracking-widest text-blue-400 uppercase">{item.year}</span>
-                  </div>
-                  <div className="relative flex-shrink-0">
-                    <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xl z-10 relative">
-                      {item.icon}
+          {/* Improved Node-based Timeline Design */}
+          <div className="relative mt-16 mb-16">
+            {/* Glowing Main Vertical Line */}
+            <div className="absolute left-[24px] md:left-1/2 top-4 bottom-0 w-1 -translate-x-1/2 bg-gradient-to-b from-blue-500/0 via-blue-500/20 to-blue-500/0 rounded-full" />
+            
+            <div className="flex flex-col gap-12 md:gap-8 relative z-10">
+              {t.timeline.map((item, i) => {
+                const isEven = i % 2 === 0;
+                return (
+                  <Reveal key={i} delay={i * 0.15} direction={isEven ? "left" : "right"}>
+                    <div className="relative flex flex-col md:flex-row items-start md:items-center group">
+                      
+                      {/* Left Side (Desktop Year Pill) */}
+                      <div className={`hidden md:flex flex-1 ${isEven ? 'justify-end pr-14' : 'justify-start pl-14 order-3'}`}>
+                        <div className={`px-5 py-2 rounded-full border border-blue-500/20 bg-blue-500/5 backdrop-blur-sm shadow-[0_0_15px_rgba(59,130,246,0.1)] group-hover:border-blue-400/50 group-hover:bg-blue-500/10 group-hover:-translate-y-1 transition-all duration-300`}>
+                          <span className="text-sm font-bold tracking-widest text-blue-400 uppercase">{item.year}</span>
+                        </div>
+                      </div>
+
+                      {/* Timeline Node */}
+                      <div className={`absolute md:relative left-[24px] md:left-auto top-0 md:top-auto -translate-x-1/2 md:translate-x-0 w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#050810] border-4 border-white/10 group-hover:border-cyan-400 flex items-center justify-center text-xl md:text-2xl z-20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] order-2 mt-1 md:mt-0`}>
+                        <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
+                        <span className="relative z-10 group-hover:scale-110 transition-transform">{item.icon}</span>
+                      </div>
+
+                      {/* Content Card */}
+                      <div className={`w-full md:flex-1 pl-20 md:pl-0 pt-2 md:pt-0 ${isEven ? 'md:pl-14 order-3' : 'md:pr-14 order-1 text-left md:text-right'}`}>
+                        <div className="p-6 md:p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] group-hover:border-blue-500/30 group-hover:bg-white/[0.04] transition-all duration-500 shadow-xl group-hover:shadow-blue-500/10 relative overflow-hidden">
+                          {/* Inner gradient line indicating the connection side */}
+                          <div className={`absolute top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${isEven ? 'left-0' : 'left-0 md:right-0 md:left-auto'}`} />
+                          
+                          <span className="md:hidden text-xs font-bold tracking-widest text-blue-400 uppercase mb-3 block">{item.year}</span>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">{item.title}</h3>
+                          <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                        </div>
+                      </div>
+
                     </div>
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <span className="md:hidden text-xs font-bold tracking-widest text-blue-400 uppercase">{item.year}</span>
-                    <h3 className="text-lg font-bold text-white mt-1 mb-2">{item.title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+                  </Reveal>
+                );
+              })}
+            </div>
           </div>
 
           <Reveal>
