@@ -121,7 +121,7 @@ export default function Home() {
       aboutP1: "I am an AI Researcher, Web & App Developer, and 2D Animator who believes the best digital experiences live at the intersection of complex engineering and visual creativity. My journey began with a deep curiosity about how machines learn, which quickly evolved into a multi-disciplinary practice spanning computer vision, full-stack application development, and motion design.",
       aboutP2: "When I am not training neural networks or coding responsive web and mobile applications, you will find me animating 2D characters, designing brand identities, or exploring the latest tools in generative AI. Currently, I am actively seeking a fully-funded Master's scholarship in China to further deepen my AI research.",
       projectsTitle: "Featured Projects",
-      viewGithub: "View on GitHub",
+      viewGithub: "Project Details ->",
       loginToView: "Sign in to View Code",
       signIn: "Sign In",
       contactTitle: "Get In Touch",
@@ -177,7 +177,7 @@ export default function Home() {
       aboutP1: "我是一名AI研究员、Web与App开发者和2D动画师，相信最好的数字体验诞生于复杂工程与视觉创意的交汇处。我的旅程始于对机器学习的深厚好奇心，并迅速发展为涵盖计算机视觉、全栈应用开发和动效设计的多学科实践。",
       aboutP2: "在不训练神经网络或编写响应式Web和移动应用的时候，你会发现我在制作2D角色动画、设计品牌形象或探索最新的生成式AI工具。目前，我正在积极寻求中国的全额奖学金硕士机会，以进一步深入我的AI研究。",
       projectsTitle: "精选项目",
-      viewGithub: "在 GitHub 查看",
+      viewGithub: "项目详情 ->",
       loginToView: "登录查看代码",
       signIn: "登录",
       contactTitle: "联系我",
@@ -250,10 +250,10 @@ export default function Home() {
   }, []);
 
   const projects = useMemo(() => [
-    { id: 1, title: lang === "en" ? "Face Mask Detection System" : "口罩检测系统", category: "AI / Computer Vision", description: lang === "en" ? "Real-time face mask detection using deep learning. Built with Python, OpenCV, and TensorFlow as part of my Final Year Project." : "使用深度学习进行实时口罩检测。使用 Python、OpenCV 和 TensorFlow 作为毕业设计项目构建。", techStack: ["Python", "OpenCV", "TensorFlow", "CNN"], githubLink: "https://github.com/MohammadOwais/face-mask-detection", color: "from-violet-500/20 to-blue-500/20" },
-    { id: 2, title: lang === "en" ? "Interactive Personal Portfolio" : "互动个人主页", category: "Frontend Development", description: lang === "en" ? "A highly interactive, bilingual portfolio built with Next.js. Features Lenis smooth scrolling, Framer Motion animations, and secure Clerk authentication." : "一个基于 Next.js 构建的高交互性双语个人主页。具有 Lenis 平滑滚动、Framer Motion 动画和安全的 Clerk 身份验证功能。", techStack: ["Next.js", "Tailwind CSS", "Framer Motion", "Lenis"], githubLink: "https://github.com/owaiskhan2501000/owais-portfolio-web", color: "from-emerald-500/20 to-teal-500/20" },
-    { id: 3, title: lang === "en" ? "AI-Powered Image Upscaler" : "AI 驱动的图像放大器", category: "AI / Computer Vision", description: lang === "en" ? "An advanced image upscaling tool built using the Real-ESRGAN deep learning model to enhance image resolution and restore details perfectly." : "使用 Real-ESRGAN 深度学习模型构建的高级图像放大工具，可完美提高图像分辨率并恢复细节。", techStack: ["Python", "PyTorch", "Real-ESRGAN", "OpenCV"], githubLink: "https://github.com/owaiskhan2501000/AI-Powered-Image-Upscaler", color: "from-blue-500/20 to-indigo-500/20" },
-    { id: 4, title: lang === "en" ? "AI-Powered Video Upscaler" : "AI 驱动的视频放大器", category: "AI / Video Processing", description: lang === "en" ? "A deep learning-based video upscaling tool designed to enhance video resolution, restore frame details, and improve temporal consistency." : "基于深度学习的视频放大工具，旨在提高视频分辨率、恢复帧细节并改善时间一致性。", techStack: ["Python", "PyTorch", "OpenCV", "Deep Learning"], githubLink: "https://github.com/owaiskhan2501000", color: "from-purple-500/20 to-fuchsia-500/20" },
+    { id: 1, title: lang === "en" ? "Face Mask Detection System" : "口罩检测系统", category: "AI / Computer Vision", description: lang === "en" ? "Real-time face mask detection using deep learning. Built with Python, OpenCV, and TensorFlow as part of my Final Year Project." : "使用深度学习进行实时口罩检测。使用 Python、OpenCV 和 TensorFlow 作为毕业设计项目构建。", techStack: ["Python", "OpenCV", "TensorFlow", "CNN"], githubLink: "#", color: "from-violet-500/20 to-blue-500/20" },
+    { id: 2, title: lang === "en" ? "Interactive Personal Portfolio" : "互动个人主页", category: "Frontend Development", description: lang === "en" ? "A highly interactive, bilingual portfolio built with Next.js. Features Lenis smooth scrolling, Framer Motion animations, and secure Clerk authentication." : "一个基于 Next.js 构建的高交互性双语个人主页。具有 Lenis 平滑滚动、Framer Motion 动画和安全的 Clerk 身份验证功能。", techStack: ["Next.js", "Tailwind CSS", "Framer Motion", "Lenis"], githubLink: "#", color: "from-emerald-500/20 to-teal-500/20" },
+    { id: 3, title: lang === "en" ? "AI-Powered Image Upscaler" : "AI 驱动的图像放大器", category: "AI / Computer Vision", description: lang === "en" ? "An advanced image upscaling tool built using the Real-ESRGAN deep learning model to enhance image resolution and restore details perfectly." : "使用 Real-ESRGAN 深度学习模型构建的高级图像放大工具，可完美提高图像分辨率并恢复细节。", techStack: ["Python", "PyTorch", "Real-ESRGAN", "OpenCV"], githubLink: "#", color: "from-blue-500/20 to-indigo-500/20" },
+    { id: 4, title: lang === "en" ? "AI-Powered Video Upscaler" : "AI 驱动的视频放大器", category: "AI / Video Processing", description: lang === "en" ? "A deep learning-based video upscaling tool designed to enhance video resolution, restore frame details, and improve temporal consistency." : "基于深度学习的视频放大工具，旨在提高视频分辨率、恢复帧细节并改善时间一致性。", techStack: ["Python", "PyTorch", "OpenCV", "Deep Learning"], githubLink: "#", color: "from-purple-500/20 to-fuchsia-500/20" },
   ], [lang]);
 
   const animations = useMemo(() => [
