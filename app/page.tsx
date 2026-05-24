@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 
 /* ── Reusable Components ── */
 
@@ -22,32 +22,53 @@ const Reveal = memo(function Reveal({ children, delay = 0, direction = "up", cla
 });
 
 const Counter = memo(function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const [n, setN] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || !ref.current) return;
     let s = 0;
-    const inc = to / 120;
-    const id = setInterval(() => { s += inc; if (s >= to) { setN(to); clearInterval(id); } else setN(Math.floor(s)); }, 1000 / 60);
-    return () => clearInterval(id);
-  }, [inView, to]);
-  return <span ref={ref}>{n}{suffix}</span>;
+    const inc = to / 60;
+    let id: number;
+    const update = () => {
+      s += inc;
+      if (ref.current) {
+        if (s >= to) {
+          ref.current.textContent = String(to) + suffix;
+        } else {
+          ref.current.textContent = String(Math.floor(s)) + suffix;
+          id = requestAnimationFrame(update);
+        }
+      }
+    };
+    id = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(id);
+  }, [inView, to, suffix]);
+  return <span ref={ref}>0{suffix}</span>;
 });
 
 const MagneticWrap = memo(function MagneticWrap({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
+
   const handleMove = useCallback((e: React.MouseEvent) => {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    setPos({ x: (e.clientX - r.left - r.width / 2) * 0.15, y: (e.clientY - r.top - r.height / 2) * 0.15 });
-  }, []);
-  const handleLeave = useCallback(() => setPos({ x: 0, y: 0 }), []);
+    x.set((e.clientX - r.left - r.width / 2) * 0.15);
+    y.set((e.clientY - r.top - r.height / 2) * 0.15);
+  }, [x, y]);
+
+  const handleLeave = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
+
   return (
     <motion.div ref={ref} className={className} onMouseMove={handleMove} onMouseLeave={handleLeave}
-      animate={pos} transition={{ type: "spring", stiffness: 200, damping: 15 }}
+      style={{ x: springX, y: springY }}
     >{children}</motion.div>
   );
 });
@@ -92,23 +113,42 @@ export default function Home() {
 
   // Active section tracking
   useEffect(() => {
-    let tick = false;
-    const ids = ["contact", "animations", "projects", "skills", "journey", "top"];
-    const elements = ids.map(id => ({ id, el: document.getElementById(id) }));
-    const onScroll = () => {
-      if (tick) return;
-      tick = true;
-      requestAnimationFrame(() => {
-        setIsNavScrolled(window.scrollY > 60);
-        for (const { id, el } of elements) {
-          const targetEl = el || document.getElementById(id); // fallback if not mounted instantly
-          if (targetEl && targetEl.getBoundingClientRect().top <= 200) { setActiveSection(id); break; }
+    const ids = ["contact", "animations", "projects", "skills", "journey", "about", "top"];
+    
+    // 1. Setup IntersectionObserver instead of a scroll event for elements
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
         }
-        tick = false;
       });
+    }, { rootMargin: "-40% 0px -40% 0px" });
+
+    // Delay observing slightly to ensure DOM is ready
+    setTimeout(() => {
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+    }, 100);
+
+    // 2. Efficiently track just the navbar background boolean on scroll
+    let tick = false;
+    const onScrollNav = () => {
+      if (!tick) {
+        requestAnimationFrame(() => {
+          setIsNavScrolled(window.scrollY > 60);
+          tick = false;
+        });
+        tick = true;
+      }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScrollNav, { passive: true });
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScrollNav);
+    };
   }, []);
 
   // Force layout recalculation on mount (fixes mobile initial render)
@@ -268,9 +308,9 @@ export default function Home() {
   ], [lang]);
 
   const animations = useMemo(() => [
-    { id: 1, title: "Character Walk Cycle", src: "/clip1.mp4" },
-    { id: 2, title: "Explainer Animation", src: "/clip2.mp4" },
-    { id: 3, title: "Logo Motion Reveal", src: "/clip3.mp4" },
+    { id: 1, title: "Character Walk Cycle", link: "https://youtube.com/MohammadOwais", platform: "YouTube" },
+    { id: 2, title: "Explainer Animation", link: "https://behance.net/MohammadOwais", platform: "Behance" },
+    { id: 3, title: "Logo Motion Reveal", link: "https://youtube.com/MohammadOwais", platform: "YouTube" },
   ], []);
 
   const navLinks = useMemo(() => [
@@ -350,12 +390,11 @@ export default function Home() {
 
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-        {/* Parallax background */}
+        {/* Parallax background (Optimized CSS gradient to prevent lagging) */}
         <motion.div className="absolute inset-0 z-0 transform-gpu pointer-events-none" style={{ y: heroY, willChange: "transform" }}>
-          <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 transform-gpu">
-            <source src="/bg-video.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050810]/40 via-[#050810]/70 to-[#050810]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-[#050810] to-[#050810]/90"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050810]/70 to-[#050810]" />
         </motion.div>
 
         {/* Ambient orbs — GPU-composited */}
@@ -591,14 +630,18 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {animations.map((a, i) => (
               <Reveal key={a.id} delay={i * 0.1}>
-                <div className="rounded-2xl overflow-hidden group bg-white/[0.02] border border-white/[0.06] hover:border-white/15 transition-all duration-500">
-                  <div className="relative aspect-video bg-black">
-                    <video src={a.src} autoPlay loop muted playsInline preload="none" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
+                {/* Replaced <video> with optimized hyperlink card for extreme performance */}
+                <a href={a.link} target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden group bg-white/[0.02] border border-white/[0.06] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500">
+                  <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-6 text-center">
+                    <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[2px] text-gray-500 group-hover:text-gray-300 mb-2">Watch on {a.platform}</span>
                   </div>
-                  <div className="p-4">
+                  <div className="p-4 border-t border-white/[0.04]">
                     <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{a.title}</h3>
                   </div>
-                </div>
+                </a>
               </Reveal>
             ))}
           </div>
