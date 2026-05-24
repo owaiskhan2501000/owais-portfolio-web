@@ -8,16 +8,16 @@ import { motion, useInView, useScroll, useTransform, AnimatePresence, useMotionV
 /* ── Reusable Components ── */
 
 const Reveal = memo(function Reveal({ children, delay = 0, direction = "up", className = "" }: { children: React.ReactNode; delay?: number; direction?: "up" | "left" | "right"; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const xy = { up: { y: 50 }, left: { x: -50 }, right: { x: 50 } }[direction];
+  const xy = { up: { y: 40 }, left: { x: -40 }, right: { x: 40 } }[direction];
   return (
-    <motion.div ref={ref} className={className}
+    <motion.div className={className}
       initial={{ opacity: 0, ...xy }}
-      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-      style={{ willChange: inView ? "auto" : "transform, opacity" }}
-    >{children}</motion.div>
+      whileInView={{ opacity: 1, y: 0, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
   );
 });
 
@@ -162,15 +162,23 @@ export default function Home() {
     if (isMobile) return;
     let id: number;
     let destroyed = false;
+    let lenisInstance: any = null;
+    
     import("lenis").then(({ default: Lenis }) => {
       if (destroyed) return;
-      const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1 });
-      const raf = (t: number) => { lenis.raf(t); id = requestAnimationFrame(raf); };
+      lenisInstance = new Lenis({ lerp: 0.08, wheelMultiplier: 0.8, smoothWheel: true });
+      const raf = (t: number) => { 
+        lenisInstance.raf(t); 
+        id = requestAnimationFrame(raf); 
+      };
       id = requestAnimationFrame(raf);
-      // store cleanup
-      (window as unknown as Record<string, unknown>).__lenisCleanup = () => { cancelAnimationFrame(id); lenis.destroy(); };
     });
-    return () => { destroyed = true; const c = (window as unknown as Record<string, unknown>).__lenisCleanup as (() => void) | undefined; c?.(); };
+    
+    return () => { 
+      destroyed = true; 
+      cancelAnimationFrame(id); 
+      if (lenisInstance) lenisInstance.destroy(); 
+    };
   }, []);
 
   /* ── i18n content (memoized to avoid re-creating on every render) ── */
@@ -390,18 +398,17 @@ export default function Home() {
 
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-        {/* Parallax background (Optimized CSS gradient to prevent lagging) */}
-        <motion.div className="absolute inset-0 z-0 transform-gpu pointer-events-none" style={{ y: heroY, willChange: "transform" }}>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-[#050810] to-[#050810]/90"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050810]/70 to-[#050810]" />
-        </motion.div>
+        {/* Modern CSS-only background to eliminate JS thread lag */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+           <div className="absolute inset-0 bg-[#02040a]"></div>
+           {/* Abstract Glows */}
+           <div className="absolute top-[-10%] md:top-[-20%] left-[-10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen" />
+           <div className="absolute bottom-[-10%] md:bottom-[-20%] right-[-10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-cyan-500/10 blur-[100px] mix-blend-screen" />
+           {/* Grid Pattern */}
+           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+        </div>
 
-        {/* Ambient orbs — GPU-composited */}
-        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-blue-600/8 rounded-full blur-[140px] transform-gpu will-change-[transform]" />
-        <div className="absolute bottom-1/4 -right-32 w-[400px] h-[400px] bg-purple-600/6 rounded-full blur-[120px] transform-gpu will-change-[transform]" />
-
-        <motion.div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-16" style={{ opacity: heroOpacity }}>
+        <motion.div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-16" style={{ y: heroY, opacity: heroOpacity }}>
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             {/* Text */}
             <div className="flex-1 text-center lg:text-left order-2 lg:order-1">
@@ -462,20 +469,20 @@ export default function Home() {
       </section>
 
       {/* ━━━ STATS BAR ━━━ */}
-      <section className="relative z-10 -mt-12 sm:-mt-16 mb-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-5 sm:p-8 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 backdrop-blur-sm">
+      <section className="relative z-20 -mt-16 sm:-mt-20 mb-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-[#0b101c]/80 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-[0_0_40px_-15px_rgba(59,130,246,0.3)] backdrop-blur-xl flex flex-wrap sm:flex-nowrap justify-between gap-6 sm:gap-8">
             {([
               { value: 10, suffix: "+", label: t.statsProjects },
               { value: 12, suffix: "+", label: t.statsTech },
               { value: 3, suffix: "+", label: t.statsExperience },
               { value: 200, suffix: "+", label: t.statsCommits },
             ] as const).map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="text-2xl sm:text-3xl font-black bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+              <div key={i} className="flex-1 text-center min-w-[40%] sm:min-w-0">
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-b from-blue-300 to-cyan-500 bg-clip-text text-transparent drop-shadow-md">
                   <Counter to={s.value} suffix={s.suffix} />
                 </div>
-                <div className="text-gray-500 text-xs sm:text-sm font-medium mt-1">{s.label}</div>
+                <div className="text-gray-400 text-xs sm:text-sm font-semibold tracking-wide uppercase mt-2">{s.label}</div>
               </div>
             ))}
           </div>
@@ -546,27 +553,37 @@ export default function Home() {
 
       {/* ━━━ SKILLS ━━━ */}
       <section id="skills" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <Reveal>
-            <p className="text-xs uppercase tracking-[4px] text-blue-400 font-semibold mb-4 text-center">{t.skillsTitle}</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-center mb-16">{lang === "en" ? "What I Work With" : "我使用的技术"}</h2>
+            <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.skillsTitle}</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-center mb-16">{lang === "en" ? "Technical Arsenal" : "我使用的技术"}</h2>
           </Reveal>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {t.skills.map((skill, i) => (
-              <Reveal key={i} delay={i * 0.08}>
-                <div className="group p-5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-300">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{skill.icon}</span>
-                      <span className="text-white font-semibold text-sm">{skill.name}</span>
+              <Reveal key={i} delay={i * 0.05}>
+                <div className="group relative p-6 rounded-2xl bg-[#0a0f1c] border border-white/5 hover:border-cyan-500/50 shadow-lg hover:shadow-[0_0_30px_-5px_rgba(34,211,238,0.2)] transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-300" />
+                  <div className="relative z-10 flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-900/50 to-cyan-900/50 border border-cyan-500/20 flex items-center justify-center text-2xl shadow-inner">
+                        {skill.icon}
+                      </div>
+                      <span className="text-white font-bold text-base">{skill.name}</span>
                     </div>
-                    <span className="text-xs font-bold text-blue-400 tabular-nums">{skill.level}%</span>
-                  </div>
-                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                    <motion.div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
-                      initial={{ width: 0 }} whileInView={{ width: `${skill.level}%` }} viewport={{ once: true }}
-                      transition={{ duration: 1.2, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }} />
+                    <div>
+                      <div className="flex justify-between text-xs mb-2">
+                        <span className="text-cyan-400 font-bold uppercase tracking-wider">Proficiency</span>
+                        <span className="text-white font-black">{skill.level}%</span>
+                      </div>
+                      <div className="w-full bg-[#050810] border border-white/5 rounded-full h-2 overflow-hidden">
+                        <motion.div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 relative"
+                          initial={{ width: 0 }} whileInView={{ width: `${skill.level}%` }} viewport={{ once: true }}
+                          transition={{ duration: 1.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+                           {/* Shine effect inside progress bar */}
+                           <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40 blur-[2px]" />
+                        </motion.div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Reveal>
@@ -577,35 +594,40 @@ export default function Home() {
 
       {/* ━━━ PROJECTS ━━━ */}
       <section id="projects" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
         <div className="max-w-6xl mx-auto">
           <Reveal>
-            <p className="text-xs uppercase tracking-[4px] text-blue-400 font-semibold mb-4 text-center">{t.projectsTitle}</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-center mb-16">{lang === "en" ? "Things I've Built" : "我构建的项目"}</h2>
+            <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.projectsTitle}</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-center mb-16">{lang === "en" ? "Things I've Built" : "我构建的项目"}</h2>
           </Reveal>
-          <div className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-8">
             {projects.map((p, i) => (
               <Reveal key={p.id} delay={i * 0.1}>
-                <div className="group relative rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/15 transition-all duration-500 overflow-hidden h-full flex flex-col">
-                  {/* Color accent */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${p.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                  <div className="relative p-6 sm:p-8 flex flex-col flex-1">
-                    <span className="text-[11px] font-bold uppercase tracking-[3px] text-gray-500 mb-3">{p.category}</span>
-                    <h3 className="text-xl sm:text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors">{p.title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">{p.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {p.techStack.map((tech, j) => <span key={j} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/5">{tech}</span>)}
+                <div className="group relative rounded-3xl bg-[#0a0f1c] border border-white/5 hover:border-cyan-500/30 transition-all duration-500 overflow-hidden h-full flex flex-col hover:shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)] hover:-translate-y-1">
+                  {/* Clean glowing accent */}
+                  <div className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl ${p.color} blur-[80px] opacity-0 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none`} />
+                  
+                  <div className="relative p-6 sm:p-8 flex flex-col flex-1 z-10">
+                    <span className="text-[11px] font-bold uppercase tracking-[3px] text-cyan-500/80 mb-3">{p.category}</span>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white group-hover:text-cyan-200 transition-colors">{p.title}</h3>
+                    <p className="text-gray-400 text-[14px] leading-relaxed mb-6 flex-1">{p.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-8">
+                      {p.techStack.map((tech, j) => (
+                        <span key={j} className="text-xs font-semibold px-3 py-1.5 rounded-md bg-[#050810] text-gray-300 border border-white/5 group-hover:border-white/10 group-hover:text-white transition-colors">{tech}</span>
+                      ))}
                     </div>
-                    <div className="mt-auto">
+                    
+                    <div className="mt-auto pt-6 border-t border-white/5">
                       <SignedIn>
-                        <a href={p.githubLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-blue-400 transition-colors group/link">
-                          {t.viewGithub} <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        <a href={p.githubLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-cyan-400 transition-colors group/link w-fit">
+                          {t.viewGithub} 
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover/link:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </a>
                       </SignedIn>
                       <SignedOut>
                         <SignInButton mode="modal">
-                          <button className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                          <button className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-cyan-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                             {t.loginToView}
                           </button>
                         </SignInButton>
@@ -621,11 +643,10 @@ export default function Home() {
 
       {/* ━━━ ANIMATIONS ━━━ */}
       <section id="animations" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
         <div className="max-w-6xl mx-auto">
           <Reveal>
-            <p className="text-xs uppercase tracking-[4px] text-blue-400 font-semibold mb-4 text-center">{t.animTitle}</p>
-            <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto text-center mb-12">{t.animDesc}</p>
+            <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.animTitle}</p>
+            <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto text-center mb-16">{t.animDesc}</p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {animations.map((a, i) => (
@@ -649,31 +670,35 @@ export default function Home() {
       </section>
 
       {/* ━━━ CONTACT ━━━ */}
-      <section id="contact" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-white/10" />
-        <div className="max-w-xl mx-auto">
+      <section id="contact" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative min-h-[80vh] flex items-center">
+        {/* Glow behind contact */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-[400px] bg-blue-600/10 blur-[120px] pointer-events-none mix-blend-screen" />
+        
+        <div className="max-w-2xl mx-auto w-full z-10">
           <Reveal>
-            <p className="text-xs uppercase tracking-[4px] text-blue-400 font-semibold mb-4 text-center">{t.contactTitle}</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-center mb-4">{lang === "en" ? "Let's Work Together" : "让我们一起合作"}</h2>
-            <p className="text-gray-500 text-center mb-12 text-sm sm:text-base">{t.contactSubtitle}</p>
+            <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.contactTitle}</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-center mb-6">{lang === "en" ? "Let's Build Something" : "让我们一起合作"}</h2>
+            <p className="text-gray-400 text-center mb-12 text-[15px] sm:text-base max-w-lg mx-auto leading-relaxed">{t.contactSubtitle}</p>
           </Reveal>
-          <Reveal delay={0.15}>
-            <form onSubmit={handleSubmit} className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 sm:p-8 flex flex-col gap-5">
+          <Reveal delay={0.1}>
+            <form onSubmit={handleSubmit} className="bg-[#0a0f1c]/90 border border-white/10 rounded-3xl p-8 sm:p-10 flex flex-col gap-6 shadow-2xl shadow-black">
               <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">{t.nameLabel}</label>
-                <input type="text" name="name" required className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" placeholder={lang === "en" ? "John Doe" : "张三"} />
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t.nameLabel}</label>
+                  <input type="text" name="name" required className="w-full bg-[#050810] border border-white/5 rounded-xl px-5 py-4 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all hover:bg-white/[0.02]" placeholder={lang === "en" ? "John Doe" : "张三"} />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t.emailLabel}</label>
+                  <input type="email" name="email" required className="w-full bg-[#050810] border border-white/5 rounded-xl px-5 py-4 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all hover:bg-white/[0.02]" placeholder="john@example.com" />
+                </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">{t.emailLabel}</label>
-                <input type="email" name="email" required className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" placeholder="john@example.com" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">{t.msgLabel}</label>
-                <textarea name="message" rows={5} required className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all resize-none" placeholder={lang === "en" ? "Tell me about your project..." : "告诉我您的项目..."} />
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t.msgLabel}</label>
+                <textarea name="message" rows={4} required className="w-full bg-[#050810] border border-white/5 rounded-xl px-5 py-4 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all resize-none hover:bg-white/[0.02]" placeholder={lang === "en" ? "Tell me about your project..." : "告诉我您的项目..."} />
               </div>
               <MagneticWrap>
-                <button type="submit" disabled={formStatus === "sending"} className="w-full bg-white text-black font-bold py-3.5 rounded-xl text-sm hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={formStatus === "sending"} className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black py-4 rounded-xl text-sm hover:shadow-[0_0_20px_-5px_rgba(34,211,238,0.5)] hover:scale-[1.01] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
                   {formStatus === "sending" ? t.sending : formStatus === "sent" ? t.sent : t.sendBtn}
                 </button>
               </MagneticWrap>
