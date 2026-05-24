@@ -113,7 +113,7 @@ export default function Home() {
 
   // Active section tracking
   useEffect(() => {
-    const ids = ["contact", "animations", "projects", "skills", "journey", "about", "top"];
+    const ids = ["contact", "animations", "projects", "certifications", "skills", "journey", "about", "top"];
     
     // 1. Setup IntersectionObserver instead of a scroll event for elements
     const observer = new IntersectionObserver((entries) => {
@@ -221,6 +221,11 @@ export default function Home() {
         { name: "Computer Vision", level: 75, icon: "👁️" },
         { name: "UI/UX Design", level: 70, icon: "🎨" },
       ],
+      certTitle: "Licenses & Certifications",
+      certs: [
+        { name: "Responsive Web Design", issuer: "freeCodeCamp", date: "Jan 2024", link: "https://freecodecamp.org/certification/mohammad-owais/responsive-web-design" },
+        { name: "Generative AI Fundamentals", issuer: "Google", date: "May 2024", link: "#" },
+      ],
       statsProjects: "Projects",
       statsTech: "Technologies",
       statsExperience: "Years Exp.",
@@ -234,6 +239,7 @@ export default function Home() {
       navAbout: "About",
       navJourney: "Journey",
       navSkills: "Skills",
+      navCerts: "Certs",
       navProjects: "Projects",
       navAnimations: "Animations",
       navContact: "Contact",
@@ -276,6 +282,11 @@ export default function Home() {
         { name: "计算机视觉", level: 75, icon: "👁️" },
         { name: "UI/UX 设计", level: 70, icon: "🎨" },
       ],
+      certTitle: "执照与认证",
+      certs: [
+        { name: "响应式Web设计", issuer: "freeCodeCamp", date: "2024年1月", link: "https://freecodecamp.org/certification/mohammad-owais/responsive-web-design" },
+        { name: "生成式AI基础", issuer: "Google", date: "2024年5月", link: "#" },
+      ],
       statsProjects: "项目",
       statsTech: "技术",
       statsExperience: "年经验",
@@ -289,6 +300,7 @@ export default function Home() {
       navAbout: "关于",
       navJourney: "经历",
       navSkills: "技能",
+      navCerts: "证书",
       navProjects: "项目",
       navAnimations: "动画",
       navContact: "联系",
@@ -326,10 +338,11 @@ export default function Home() {
     { id: "about", label: t.navAbout },
     { id: "journey", label: t.navJourney },
     { id: "skills", label: t.navSkills },
+    { id: "certifications", label: t.navCerts },
     { id: "projects", label: t.navProjects },
     { id: "animations", label: t.navAnimations },
     { id: "contact", label: t.navContact },
-  ], [t.navHome, t.navAbout, t.navJourney, t.navSkills, t.navProjects, t.navAnimations, t.navContact]);
+  ], [t.navHome, t.navAbout, t.navJourney, t.navSkills, t.navCerts, t.navProjects, t.navAnimations, t.navContact]);
 
   return (
     <main id="top" className="min-h-[100dvh] bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
@@ -586,6 +599,35 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ CERTIFICATIONS ━━━ */}
+      <section id="certifications" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative bg-gradient-to-b from-transparent via-[#050810]/50 to-transparent">
+        <div className="max-w-5xl mx-auto">
+          <Reveal>
+            <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.certTitle}</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-center mb-16">{lang === "en" ? "Achievements" : "成就和证书"}</h2>
+          </Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {t.certs.map((cert, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <a href={cert.link} target="_blank" rel="noopener noreferrer" className="group block relative p-6 sm:p-8 rounded-3xl bg-[#0a0f1c] border border-white/5 hover:border-cyan-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(34,211,238,0.15)] flex gap-5 items-center">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-blue-900/40 to-cyan-900/40 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">{cert.name}</h3>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-gray-400 font-medium">{cert.issuer}</span>
+                      <span className="w-1 h-1 rounded-full bg-cyan-500/50"></span>
+                      <span className="text-cyan-500/80 font-semibold">{cert.date}</span>
+                    </div>
+                  </div>
+                </a>
               </Reveal>
             ))}
           </div>
