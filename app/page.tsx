@@ -52,6 +52,30 @@ const MagneticWrap = memo(function MagneticWrap({ children, className = "" }: { 
   );
 });
 
+const Typewriter = memo(function Typewriter({ greeting, name }: { greeting: string, name: string }) {
+  const [typed, setTyped] = useState("");
+  useEffect(() => {
+    setTyped("");
+    let i = 0;
+    const full = `${greeting} ${name}`;
+    let tid: NodeJS.Timeout;
+    const type = () => { 
+      setTyped(full.slice(0, ++i)); 
+      if (i < full.length) tid = setTimeout(type, Math.random() * 40 + 60); 
+    };
+    type();
+    return () => clearTimeout(tid);
+  }, [greeting, name]);
+
+  return (
+    <>
+      <span className="text-white">{typed.slice(0, greeting.length + 1)}</span>
+      <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">{typed.slice(greeting.length + 1)}</span>
+      <span className="text-blue-400 font-light animate-cursor-blink">|</span>
+    </>
+  );
+});
+
 /* ── Page ── */
 
 export default function Home() {
@@ -70,14 +94,15 @@ export default function Home() {
   useEffect(() => {
     let tick = false;
     const ids = ["contact", "animations", "projects", "skills", "journey", "top"];
+    const elements = ids.map(id => ({ id, el: document.getElementById(id) }));
     const onScroll = () => {
       if (tick) return;
       tick = true;
       requestAnimationFrame(() => {
         setIsNavScrolled(window.scrollY > 60);
-        for (const id of ids) {
-          const el = document.getElementById(id);
-          if (el && el.getBoundingClientRect().top <= 200) { setActiveSection(id); break; }
+        for (const { id, el } of elements) {
+          const targetEl = el || document.getElementById(id); // fallback if not mounted instantly
+          if (targetEl && targetEl.getBoundingClientRect().top <= 200) { setActiveSection(id); break; }
         }
         tick = false;
       });
@@ -222,18 +247,6 @@ export default function Home() {
     },
   })[lang], [lang]);
 
-  // Typewriter
-  const [typed, setTyped] = useState("");
-  useEffect(() => {
-    setTyped("");
-    let i = 0;
-    const full = `${t.greeting} ${t.name}`;
-    let tid: NodeJS.Timeout;
-    const type = () => { setTyped(full.slice(0, ++i)); if (i < full.length) tid = setTimeout(type, Math.random() * 40 + 60); };
-    type();
-    return () => clearTimeout(tid);
-  }, [t.greeting, t.name]);
-
   // Contact form handler
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -361,9 +374,7 @@ export default function Home() {
 
               <div className="min-h-[4.5rem] sm:min-h-[6rem] lg:min-h-[8rem] mb-4">
                 <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1]">
-                  <span className="text-white">{typed.slice(0, t.greeting.length + 1)}</span>
-                  <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">{typed.slice(t.greeting.length + 1)}</span>
-                  <span className="text-blue-400 font-light animate-cursor-blink">|</span>
+                  <Typewriter greeting={t.greeting} name={t.name} />
                 </h1>
               </div>
 
