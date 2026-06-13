@@ -162,7 +162,7 @@ export default function Home() {
     if (isMobile) return;
     let id: number;
     let destroyed = false;
-    let lenisInstance: any = null;
+    let lenisInstance: unknown = null;
     
     import("lenis").then(({ default: Lenis }) => {
       if (destroyed) return;
@@ -328,9 +328,9 @@ export default function Home() {
   ], [lang]);
 
   const animations = useMemo(() => [
-    { id: 1, title: "Character Walk Cycle", link: "https://youtube.com/MohammadOwais", platform: "YouTube" },
-    { id: 2, title: "Explainer Animation", link: "https://behance.net/MohammadOwais", platform: "Behance" },
-    { id: 3, title: "Logo Motion Reveal", link: "https://youtube.com/MohammadOwais", platform: "YouTube" },
+    { id: 1, title: "Character Walk Cycle", link: "https://youtube.com/MohammadOwais", platform: "YouTube", video: "/clip1.mp4" },
+    { id: 2, title: "Explainer Animation", link: "https://behance.net/MohammadOwais", platform: "Behance", video: "/clip2.mp4" },
+    { id: 3, title: "Logo Motion Reveal", link: "https://youtube.com/MohammadOwais", platform: "YouTube", video: "/clip3.mp4" },
   ], []);
 
   const navLinks = useMemo(() => [
@@ -411,14 +411,19 @@ export default function Home() {
 
       {/* ━━━ HERO ━━━ */}
       <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
-        {/* Modern CSS-only background to eliminate JS thread lag */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-           <div className="absolute inset-0 bg-[#02040a]"></div>
-           {/* Abstract Glows */}
-           <div className="absolute top-[-10%] md:top-[-20%] left-[-10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen" />
-           <div className="absolute bottom-[-10%] md:bottom-[-20%] right-[-10%] w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] rounded-full bg-cyan-500/10 blur-[100px] mix-blend-screen" />
-           {/* Grid Pattern */}
-           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+        {/* Cinematic Video Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[#02040a]/80 z-10"></div>
+          <video
+            src="/bg-video.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover scale-105"
+          />
+          {/* Grid Pattern overlay for texture */}
+          <div className="absolute inset-0 z-20 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
         </div>
 
         <motion.div className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-16" style={{ y: heroY, opacity: heroOpacity }}>
@@ -690,19 +695,32 @@ export default function Home() {
             <p className="text-xs uppercase tracking-[4px] text-cyan-400 font-semibold mb-4 text-center">{t.animTitle}</p>
             <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto text-center mb-16">{t.animDesc}</p>
           </Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {animations.map((a, i) => (
               <Reveal key={a.id} delay={i * 0.1}>
-                {/* Replaced <video> with optimized hyperlink card for extreme performance */}
-                <a href={a.link} target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden group bg-white/[0.02] border border-white/[0.06] hover:border-blue-500/30 hover:bg-white/[0.04] transition-all duration-500">
-                  <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-6 text-center">
-                    <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <a href={a.link} target="_blank" rel="noopener noreferrer" className="block rounded-3xl overflow-hidden group border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]">
+                  <div className="relative aspect-video bg-black overflow-hidden">
+                    <video
+                      src={a.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      </div>
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-[2px] text-gray-500 group-hover:text-gray-300 mb-2">Watch on {a.platform}</span>
                   </div>
-                  <div className="p-4 border-t border-white/[0.04]">
-                    <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{a.title}</h3>
+                  <div className="p-5 bg-[#0a0f1c]">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-white text-base group-hover:text-blue-400 transition-colors">{a.title}</h3>
+                      <span className="text-[10px] font-bold uppercase tracking-[1px] text-gray-500 bg-white/5 px-2 py-1 rounded-md">
+                        {a.platform}
+                      </span>
+                    </div>
                   </div>
                 </a>
               </Reveal>
@@ -724,7 +742,7 @@ export default function Home() {
           </Reveal>
           <Reveal delay={0.1}>
             <form onSubmit={handleSubmit} className="bg-[#0a0f1c]/90 border border-white/10 rounded-3xl p-8 sm:p-10 flex flex-col gap-6 shadow-2xl shadow-black">
-              <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+              <input type="hidden" name="access_key" value={process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE"} />
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">{t.nameLabel}</label>
