@@ -162,7 +162,8 @@ export default function Home() {
     if (isMobile) return;
     let id: number;
     let destroyed = false;
-    let lenisInstance: unknown = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let lenisInstance: any = null;
     
     import("lenis").then(({ default: Lenis }) => {
       if (destroyed) return;
