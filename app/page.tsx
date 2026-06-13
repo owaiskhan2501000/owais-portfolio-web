@@ -97,6 +97,52 @@ const Typewriter = memo(function Typewriter({ greeting, name }: { greeting: stri
   );
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AnimationCard = memo(function AnimationCard({ a }: { a: any }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  return (
+    <a 
+      href={a.link} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="block rounded-3xl overflow-hidden group border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]"
+      onMouseEnter={() => videoRef.current?.play()}
+      onMouseLeave={() => {
+        if (videoRef.current) {
+          videoRef.current.pause();
+          videoRef.current.currentTime = 0;
+        }
+      }}
+    >
+      <div className="relative aspect-video bg-black overflow-hidden">
+        <video
+          ref={videoRef}
+          src={a.video}
+          muted
+          loop
+          playsInline
+          preload="none"
+          className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+        />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+        </div>
+      </div>
+      <div className="p-5 bg-[#0a0f1c]">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-white text-base group-hover:text-blue-400 transition-colors">{a.title}</h3>
+          <span className="text-[10px] font-bold uppercase tracking-[1px] text-gray-500 bg-white/5 px-2 py-1 rounded-md">
+            {a.platform}
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+});
+
 /* ── Page ── */
 
 export default function Home() {
@@ -699,31 +745,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {animations.map((a, i) => (
               <Reveal key={a.id} delay={i * 0.1}>
-                <a href={a.link} target="_blank" rel="noopener noreferrer" className="block rounded-3xl overflow-hidden group border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]">
-                  <div className="relative aspect-video bg-black overflow-hidden">
-                    <video
-                      src={a.video}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-5 bg-[#0a0f1c]">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-white text-base group-hover:text-blue-400 transition-colors">{a.title}</h3>
-                      <span className="text-[10px] font-bold uppercase tracking-[1px] text-gray-500 bg-white/5 px-2 py-1 rounded-md">
-                        {a.platform}
-                      </span>
-                    </div>
-                  </div>
-                </a>
+                <AnimationCard a={a} />
               </Reveal>
             ))}
           </div>
