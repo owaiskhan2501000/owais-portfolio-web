@@ -346,7 +346,7 @@ export default function Home() {
   ], [t.navHome, t.navAbout, t.navJourney, t.navSkills, t.navCerts, t.navProjects, t.navAnimations, t.navContact]);
 
   return (
-    <main id="top" className="min-h-[100dvh] bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
+    <main className="min-h-[100dvh] bg-[#050810] text-white font-sans relative flex flex-col overflow-x-hidden">
 
       {/* ━━━ NAVBAR ━━━ */}
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isNavScrolled ? "bg-[#050810]/80 backdrop-blur-md border-b border-white/5 shadow-2xl shadow-black/30" : ""}`}>
@@ -411,7 +411,7 @@ export default function Home() {
       </nav>
 
       {/* ━━━ HERO ━━━ */}
-      <section ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
+      <section id="top" ref={heroRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden">
         {/* Cinematic Video Background */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 bg-[#02040a]/80 z-10"></div>
