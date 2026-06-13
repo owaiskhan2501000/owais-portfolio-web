@@ -74,14 +74,24 @@ const MagneticWrap = memo(function MagneticWrap({ children, className = "" }: { 
 });
 
 const Typewriter = memo(function Typewriter({ greeting, name }: { greeting: string, name: string }) {
-  const [typed, setTyped] = useState("");
+  const greetingRef = useRef<HTMLSpanElement>(null);
+  const nameRef = useRef<HTMLSpanElement>(null);
+  
   useEffect(() => {
-    setTyped("");
     let i = 0;
     const full = `${greeting} ${name}`;
     let tid: NodeJS.Timeout;
-    const type = () => { 
-      setTyped(full.slice(0, ++i)); 
+    const type = () => {
+      i++;
+      if (greetingRef.current && nameRef.current) {
+        if (i <= greeting.length + 1) {
+           greetingRef.current.textContent = full.slice(0, i);
+           nameRef.current.textContent = "";
+        } else {
+           greetingRef.current.textContent = full.slice(0, greeting.length + 1);
+           nameRef.current.textContent = full.slice(greeting.length + 1, i);
+        }
+      }
       if (i < full.length) tid = setTimeout(type, Math.random() * 40 + 60); 
     };
     type();
@@ -90,8 +100,8 @@ const Typewriter = memo(function Typewriter({ greeting, name }: { greeting: stri
 
   return (
     <>
-      <span className="text-white">{typed.slice(0, greeting.length + 1)}</span>
-      <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">{typed.slice(greeting.length + 1)}</span>
+      <span ref={greetingRef} className="text-white"></span>
+      <span ref={nameRef} className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent"></span>
       <span className="text-blue-400 font-light animate-cursor-blink">|</span>
     </>
   );
@@ -517,7 +527,7 @@ export default function Home() {
               <div className="relative group">
                 <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-purple-500/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60" />
                 <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-72 lg:h-72 rounded-full overflow-hidden ring-2 ring-white/10 ring-offset-4 ring-offset-[#050810]">
-                  <Image src="/profile.png" alt="Mohammad Owais" fill className="object-cover object-top" priority />
+                  <Image src="/profile.png" alt="Mohammad Owais" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover object-top" priority />
                 </div>
               </div>
             </motion.div>
