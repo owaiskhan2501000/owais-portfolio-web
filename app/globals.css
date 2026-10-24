@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * "Manuscript" design system
+ * Paper, ink and a single red-pencil accent — square corners, hairline rules,
+ * serif display type and mono figure labels, like a typeset journal article.
+ */
+:root {
+  --paper: #f3efe6;
+  --paper-2: #ebe6da;
+  --ink: #1c1a16;
+  --ink-2: #4a463e;
+  --ink-3: #8a8377;
+  --rule: rgb(28 26 22 / 0.16);
+  --rule-strong: #1c1a16;
+  --red: #c8401b;
+  --mark: #f2dc6b;
+}
+
+.dark {
+  --paper: #13120f;
+  --paper-2: #1b1a16;
+  --ink: #ece6d8;
+  --ink-2: #bdb6a7;
+  --ink-3: #7c766a;
+  --rule: rgb(236 230 216 / 0.14);
+  --rule-strong: #ece6d8;
+  --red: #ff7246;
+  --mark: #6b5a12;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-red: var(--red);
+  --color-mark: var(--mark);
+  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "kern";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--mark);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* ── Utilities ─────────────────────────────────────────────── */
+@utility page {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 768px) { padding-inline: 2.5rem; }
+}
+
+/* Manuscript grid: margin label | body | sidenotes */
+@utility ms-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 2.5rem;
+  @media (width >= 1024px) {
+    grid-template-columns: 9rem minmax(0, 1fr) 15rem;
+  }
+}
+
+@utility label {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@utility hairline {
+  border-color: var(--rule);
+}
+
+/* Highlighter-pen emphasis */
+@utility marker {
+  background-image: linear-gradient(transparent 58%, var(--mark) 58%, var(--mark) 92%, transparent 92%);
+  padding-inline: 0.1em;
+}
+
+/* Paper grain */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark .grain::after { mix-blend-mode: screen; opacity: 0.035; }
+
+/* Drop cap */
+.dropcap::first-letter {
+  float: left;
+  font-family: var(--font-fraunces), serif;
+  font-size: 4.4em;
+  line-height: 0.8;
+  padding: 0.08em 0.1em 0 0;
+  color: var(--red);
+  font-weight: 500;
+}
+
+/* Keyword ticker — deliberately NOT disabled for reduced-motion users:
+   it is slow, linear, and pauses on hover. (Windows' "Animation effects: off"
+   setting reports prefers-reduced-motion and was freezing it on desktop.) */
+@keyframes ticker {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.ticker-track {
+  animation: ticker 55s linear infinite;
+  will-change: transform;
+}
+.ticker:hover .ticker-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ticker-track { animation-duration: 120s; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .grain::after { display: none; }
+}
